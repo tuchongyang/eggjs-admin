@@ -3,15 +3,19 @@
 
 import 'egg';
 import ExportSystemMenu from '../../../app/model/SystemMenu';
+import ExportSystemPermission from '../../../app/model/SystemPermission';
 import ExportSystemRole from '../../../app/model/SystemRole';
 import ExportSystemRoleMenu from '../../../app/model/SystemRoleMenu';
+import ExportSystemRolePermission from '../../../app/model/SystemRolePermission';
 import ExportSystemUser from '../../../app/model/SystemUser';
 
 declare module 'egg' {
   interface IModel {
     SystemMenu: ReturnType<typeof ExportSystemMenu>;
+    SystemPermission: ReturnType<typeof ExportSystemPermission>;
     SystemRole: ReturnType<typeof ExportSystemRole>;
     SystemRoleMenu: ReturnType<typeof ExportSystemRoleMenu>;
+    SystemRolePermission: ReturnType<typeof ExportSystemRolePermission>;
     SystemUser: ReturnType<typeof ExportSystemUser>;
   }
 }

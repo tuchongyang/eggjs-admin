@@ -59,8 +59,25 @@ export default class RoleController extends Controller {
         }).catch(err=>{
             ctx.fail(400,err.message)
         })
-        
     }
+    /**获取角色权限 */
+    @bp.get('/:id/permission')
+    public async permission(){
+        const { ctx } = this;
+        const data = await ctx.service.system.role.getPermission(ctx.params.id)
+        ctx.success(data)
+    }
+    /**新增、保存角色权限 */
+    @bp.post('/:id/permission')
+    public async permissionSave(){
+        const { ctx } = this;
+        await ctx.service.system.role.savePermission(ctx.params.id,ctx.request.body).then(()=>{
+            ctx.success()
+        }).catch(err=>{
+            ctx.fail(400,err.message)
+        })
+    }
+
     
 
 }

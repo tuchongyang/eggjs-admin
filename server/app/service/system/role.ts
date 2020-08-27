@@ -93,4 +93,38 @@ export default class RoleService extends Service {
         return await this.ctx.model.SystemRoleMenu.bulkCreate(roleMenus);
 
     }
+    // 获取角色菜单
+    async getPermission (roleId:number) {
+        const { ctx } = this
+        let list = await ctx.model.SystemRolePermission.findAll({
+            where: {roleId: roleId},
+            include:[
+                {model: this.app.model.SystemPermission,as:'permission'}
+            ]
+        })
+        //查询所有
+        return list.map(item=>{
+            item.actions = item.permission.actions.split(',').map(a=>({action:a,checked: item.actions.indexOf(a)>-1}));
+            delete item.dataValues.permission;
+            return item;
+        })
+    }
+    async savePermission(roleId:number,menus: any){
+        /**先将树形菜单checked为true的菜单取出来 */
+        let checkeds:any[] = menus.map(item=>{
+            return {
+                roleId: roleId,
+                permissionId: item.permissionId,
+                actions: item.actions.filter(a=>a.checked).map(a=>a.action).join(',')
+            }
+        });
+        
+        /**删除原来角色对应菜单，再重新保存一份新的 */
+        await this.ctx.model.SystemRolePermission.destroy({
+            where: {roleId: roleId}
+        })
+        return await this.ctx.model.SystemRolePermission.bulkCreate(checkeds);
+
+    }
+
 }
