@@ -52,6 +52,19 @@ export default class UserService extends Service {
 
         return results
     }
+    /**更新 */
+    public async update(options: any) {
+        const { ctx } = this
+        let results = { code: 10000, message: "失败", }
+        await ctx.model.SystemUser.update(options,{
+            where:{id: options.id}
+        }).then(() => {
+            results = { code: 0, message: "更新成功", }
+        }).catch(err => {
+            results = { code: 10000, message: err, }
+        })
+        return results
+    }
     /**
      * 登录
      * @param options - 参数
@@ -59,11 +72,7 @@ export default class UserService extends Service {
     public async login(options: any) {
         const { ctx } = this
         const { username, password } = options
-        let results = {
-            code: 10000,
-            message: "失败",
-            token:''
-        }
+        let results = {  code: 10000, message: "失败",token:'' }
         await ctx.model.SystemUser.findOne({
             where: {
                 username, // 查询条件
@@ -73,27 +82,16 @@ export default class UserService extends Service {
                 const hash = crypto.createHash('md5');
                 options.password = hash.update(password).digest('hex')
                 
-                await ctx.model.SystemUser.findOne({
-                    where: options,
-                }).then(() => {
+                await ctx.model.SystemUser.findOne({where: options,}).then(() => {
                     /*
                     * sign({根据什么生成token})
                     * app.config.jwt.secret 配置的密钥
                     * {expiresIn:'24h'} 过期时间
                     */
-                    
-                    const token = this.app.jwt.sign({ username,password }, this.config.jwt.secret,{expiresIn:'24h'});
-                    results = {
-                        code: 0,
-                        message: "登录成功",
-                        token
-                    }
+                    const token = this.app.jwt.sign({ user: result }, this.config.jwt.secret,{expiresIn:'24h'});
+                    results = {  code: 0, message: "登录成功",token }
                 }).catch(err => {
-                    results = {
-                        code: 10000,
-                        message: err,
-                        token: ''
-                    }
+                    results = { code: 10000, message: err, token: '' }
                 })
             } else {
                 results = { code: 10000, message: "账号不存在", token: '' }
@@ -120,27 +118,37 @@ export default class UserService extends Service {
     // 登录查询个人信息
     async getUserInfo (options) {
         const { ctx } = this
-        let userInfo = "";
+        let userInfo:any = {};
         await ctx.model.SystemUser.findOne({
             where: options,
+            include: [{
+                model: this.app.model.SystemRole,
+                as: 'role',//这里的 as需要与之前定义的as名字相同
+            }]
         }).then(async res => {
-        
-            if (res) {
-                // const roleInfo = await ctx.model.SystemRole.findById(res.role_id)
-                // res.setDataValue("roleName", roleInfo.name)
-                // await ctx.model.SystemRolePermission.findOne({
-                //     where: { role_id: res.role_id },
-                // }).then(async perRes => {
-                // if (perRes) {
-                //     res.setDataValue("authorityRouter", perRes.permission_page)
-                //     res.setDataValue("permissionButton", perRes.permission_button)
-                // }
-
-                // })
-
-            }
             userInfo = res
         })
         return userInfo
+    }
+    // 获取菜单
+    async getMenuTree (roleId:number) {
+        const { ctx } = this
+        let list = await ctx.model.SystemRoleMenu.findAll({
+            where: {roleId: roleId},
+            include:[
+                {model: this.app.model.SystemMenu,as: 'menu'}
+            ]
+        })
+        list = list.map(item=>item.menu);
+        let result:Array<any> = [];
+        let find = (menus,parentId)=>{
+            list.filter(item=>item.parentId==parentId).map(item=>{
+                item.dataValues.children = [];
+                find(item.dataValues.children,item.id);
+                menus.push(item);
+            })
+        }
+        find(result,null);
+        return result
     }
 }

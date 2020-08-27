@@ -6,14 +6,20 @@ module.exports = function(){
         if (token) {
             try {
                 // 解码token
-                ctx.app.jwt.verify(token, ctx.app.config.secret);
+                ctx.app.jwt.verify(token, ctx.app.config.secret,(err, payload) => {
+                    if(err){return false}
+                    else{
+                        ctx.session.user = payload.user
+                    }
+                });
+                
                 return true;
             } catch (error) {
                 ctx.fail(401,error.message||'解析失败')
                 return false;
             }
         } else {
-            ctx.fail(401,"没有token")
+            ctx.fail(401,"未登录")
             return false;
         }
     }

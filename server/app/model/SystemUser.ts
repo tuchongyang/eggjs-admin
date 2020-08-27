@@ -20,6 +20,16 @@ module.exports = app => {
         openid: STRING, // 微信openid
         // session_key: STRING, // 微信session_key
     },{freezeTableName: true});
-  
+    
+    // 表关联的字段
+    User.associate = function() {
+    // 一对多
+        // app.model.User.hasMany(app.model.Diary, { foreignKey: 'user_id', targetKey: 'id'});
+        /**
+         * User.belongsTo(关联的模型, { foreignKey: '使用什么字段关联', targetKey: '与关联的模型那个字段关联', as: '别名' });
+        */
+        // 一对一
+        User.belongsTo(app.model.SystemRole, { foreignKey: 'roleId', targetKey: 'id', as: 'role'});
+    }
     return User;
 };

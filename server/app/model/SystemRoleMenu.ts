@@ -1,12 +1,18 @@
 module.exports = app => {
     const { INTEGER } = app.Sequelize;
   
-    const User = app.model.define('system_role_menu', {
+    const RoleMenu = app.model.define('system_role_menu', {
         id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         roleId: INTEGER, // 角色Id
         menuId: INTEGER, //菜单Id
-        status: { type: INTEGER, defaultValue: 1 }, //  状态： 0:禁用, 1:启用
     },{freezeTableName: true});
-
-    return User;
+    // 表关联的字段
+    RoleMenu.associate = function() {
+        /**
+         * User.belongsTo(关联的模型, { foreignKey: '使用什么字段关联', targetKey: '与关联的模型那个字段关联', as: '别名' });
+        */
+        // 一对一
+        RoleMenu.belongsTo(app.model.SystemMenu, { foreignKey: 'menuId', targetKey: 'id', as: 'menu'});
+    }
+    return RoleMenu;
 };

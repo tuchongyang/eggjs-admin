@@ -25,12 +25,30 @@ export default class UserController extends Controller {
             ctx.fail(code,message);
         }
     }
+    @bp.get('/logout')
+    public async logout(){
+        const { ctx } = this;
+        ctx.session=null
+        ctx.success();
+    }
 
     @bp.post('/save')
     public async save(){
         const { ctx } = this;
         let params = ctx.request.body;
         let ret = await ctx.service.system.user.save(params);
+        if(ret.code==0){
+            ctx.success()
+        }else{
+            ctx.fail(ret.code, ret.message)
+        }
+    }
+    
+    @bp.post('/update')
+    public async update(){
+        const { ctx } = this;
+        let params = ctx.request.body;
+        let ret = await ctx.service.system.user.update(params);
         if(ret.code==0){
             ctx.success()
         }else{
@@ -51,18 +69,15 @@ export default class UserController extends Controller {
     @bp.get('/info',requireLogin)
     public async info(){
         const { ctx } = this;
-        const token = ctx.request.header.authorization
-        const result = {verify: false,message:"",data:{}}
-        await this.ctx.app.jwt.verify(token, this.ctx.app.config.jwt.secret, async function (err, decoded) {
-            if (err) {
-                return ctx.fail(400,result.message)
-            } else {
-                const userInfo = await ctx.service.system.user.getUserInfo({username: decoded.username})
-                return ctx.success(userInfo);
-            }
-        })
-        
-
-       
+        let user = ctx.session.user;
+        const userInfo = await ctx.service.system.user.getUserInfo({id: user.id})
+        return ctx.success(userInfo);
+    }
+    @bp.get('/menu',requireLogin)
+    public async menu(){
+        const { ctx } = this;
+        let user = ctx.session.user;
+        const list = await ctx.service.system.user.getMenuTree(user.roleId)
+        ctx.success(list);
     }
 }

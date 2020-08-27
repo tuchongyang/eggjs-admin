@@ -27,15 +27,17 @@ export default class MenuService extends Service {
         let list = await this.app.model.SystemMenu.findAll({
             orderby: 'sort ASC'
         })
-        let result = <any>[];
+        // console.log('list:',list)
+        let result:Array<any> = [];
         let find = (menus,parentId)=>{
             list.filter(item=>item.parentId==parentId).map(item=>{
-                item.children = [];
-                find(item.children,item.id);
+                item.dataValues.children = [];
+                find(item.dataValues.children,item.id);
                 menus.push(item);
             })
         }
         find(result,null);
+        // console.log('result:',result)
         return result;
     }
     

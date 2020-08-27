@@ -50,16 +50,47 @@ export default class RoleService extends Service {
         })
         return results
     }
-    // 登录查询个人信息
-    async getUserInfo (options) {
+    // 获取角色菜单
+    async getMenuTree (roleId:number) {
         const { ctx } = this
-        let userInfo = "";
-        await ctx.model.SystemRole.findOne({
-            where: options,
-        }).then(async res => {
-        
-            userInfo = res
+        let list = await ctx.model.SystemRoleMenu.findAll({
+            where: {roleId: roleId},
+            include:[
+                {model: this.app.model.SystemMenu,as: 'menu'}
+            ]
         })
-        return userInfo
+        list = list.map(item=>item.menu);
+        let result:Array<any> = [];
+        let find = (menus,parentId)=>{
+            list.filter(item=>item.parentId==parentId).map(item=>{
+                item.dataValues.children = [];
+                find(item.dataValues.children,item.id);
+                menus.push(item);
+            })
+        }
+        find(result,null);
+        return result
+    }
+    async saveMenuTree(roleId:number,menus: object){
+        /**先将树形菜单checked为true的菜单取出来 */
+        let checkedIds:number[] =[];
+        let checked = (menus)=>{
+            for(let i=0;i<menus.length;i++){
+                if(menus[i].checked){
+                    checkedIds.push(menus[i].id)
+                }
+                if(menus[i].children && menus[i].children.length){
+                    checked(menus[i].children)
+                }
+            }
+        }
+        checked(menus);
+        let roleMenus = checkedIds.map(a=>({roleId: roleId,menuId:a}));
+        /**删除原来角色对应菜单，再重新保存一份新的 */
+        await this.ctx.model.SystemRoleMenu.destroy({
+            where: {roleId: roleId}
+        })
+        return await this.ctx.model.SystemRoleMenu.bulkCreate(roleMenus);
+
     }
 }
