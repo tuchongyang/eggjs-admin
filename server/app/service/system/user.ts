@@ -72,7 +72,7 @@ export default class UserService extends Service {
     public async login(options: any) {
         const { ctx } = this
         const { username, password } = options
-        let results = {  code: 10000, message: "失败",token:'' }
+        let results = {  code: 400, message: "失败",token:'' }
         await ctx.model.SystemUser.findOne({
             where: {
                 username, // 查询条件
@@ -82,22 +82,24 @@ export default class UserService extends Service {
                 const hash = crypto.createHash('md5');
                 options.password = hash.update(password).digest('hex')
                 
-                await ctx.model.SystemUser.findOne({where: options,}).then(() => {
+                await ctx.model.SystemUser.findOne({where: options,}).then((data) => {
+                    if(!data){
+                        return (results = { code: 400, message: "账号不存在", token: '' })
+                    }
                     /*
                     * sign({根据什么生成token})
                     * app.config.jwt.secret 配置的密钥
                     * {expiresIn:'24h'} 过期时间
                     */
-                    const token = this.app.jwt.sign({ user: result }, this.config.jwt.secret,{expiresIn:'24h'});
+                    const token = this.app.jwt.sign({ user: data }, this.config.jwt.secret,{expiresIn:'24h'});
                     results = {  code: 0, message: "登录成功",token }
                 }).catch(err => {
-                    results = { code: 10000, message: err, token: '' }
+                    results = { code: 400, message: err, token: '' }
                 })
             } else {
-                results = { code: 10000, message: "账号不存在", token: '' }
+                results = { code: 400, message: "账号不存在", token: '' }
             }
         })
-
         return results
     }
 
@@ -126,6 +128,8 @@ export default class UserService extends Service {
                 as: 'role',//这里的 as需要与之前定义的as名字相同
             }]
         }).then(async res => {
+            var permissions = await ctx.model.SystemRolePermission.findAll({where: {roleId: res.dataValues.role.dataValues.id}});
+            res.dataValues.permissions = permissions||[]
             userInfo = res
         })
         return userInfo

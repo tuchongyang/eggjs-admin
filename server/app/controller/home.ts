@@ -5,8 +5,7 @@ export default class HomeController extends Controller {
     @bp.get('/')
     public async index() {
       const { ctx } = this;
-      ctx.
-      ctx.body = await ctx.service.test.sayHi('egg');
+      ctx.body = "欢迎访问eggjs-admin"
     }
     @bp.get('/test')
     public async test(){

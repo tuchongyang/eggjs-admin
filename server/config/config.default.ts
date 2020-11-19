@@ -22,8 +22,13 @@ export default (appInfo: EggAppInfo) => {
   config.security= {
     csrf : {
       enable: false,
-    }
+    },
+    domainWhiteList: [ '*' ]
   }
+  config.cors = {
+    origin: '*',
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS'
+};
   config.pageSize = 20
 
   // the return config will combines to EggAppConfig

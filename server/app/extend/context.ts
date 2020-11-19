@@ -1,5 +1,5 @@
 module.exports = {
-    SUCCESS_CODE: 0, // 成功
+    SUCCESS_CODE: 200, // 成功
     NO_LOGIN_CODE: 401, // 未登录
     UNIQUE_CODE: 200, // 唯一性冲突
     ERROR_CODE: 500, // 失败
@@ -8,13 +8,13 @@ module.exports = {
     },
     
     success(data, status) {
-        this.body = { code: this.SUCCESS_CODE, data };
+        this.body = { status: this.SUCCESS_CODE, result:data };
         this.status = status || 200;
     },
     
-    fail(code, message,data) {
-        this.body = { code, message, data };
-        this.status = 200;
+    fail(status, message,data) {
+        this.body = { status, message, result:data };
+        this.status = status||400;
     },
     
     notFound(msg) {
