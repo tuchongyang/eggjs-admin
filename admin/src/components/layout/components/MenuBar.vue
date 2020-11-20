@@ -20,7 +20,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import systemApi from '@/api/system'
+import systemApi from '@/views/system/api/'
 import MenuBarItem from './MenuBarItem';
 import MenuToggle  from '@/components/layout/components/MenuToggle';
 export default {

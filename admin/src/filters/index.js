@@ -2,7 +2,6 @@ import { dateFormat, formatTime } from '@/utils'
 import {cloudPlatform} from '@/utils/cloudPlatform'
 import {constantMap} from '@/utils/constant'
 import store from "@/store";
-import Model from '@/model'
 /**
  * @description     数字 格式化
  *
@@ -247,7 +246,7 @@ export function maskSecret(val){
  *         filterParams: 过滤器参数,字符串数组
  *         modelType: Model类型，如agreement对应Model.agreement
  */
-export function filter(value, type, filterParams, modelType) {
+export function filter(value, type, filterParams, model) {
     if(!filterParams) filterParams=[];
     
     switch(type){
@@ -257,17 +256,9 @@ export function filter(value, type, filterParams, modelType) {
         case 'currency': return currency(value,...filterParams);
         case 'maskSecret': return maskSecret(value,...filterParams);
         default:
-            if(type && modelType){
-                let result = Model;
-                let modelTypes = modelType.split('.');
-                for(let i =0;i<modelTypes.length;i++){
-                    if(!result[modelTypes[i]]){
-                        return emptyFilter(value);
-                    }
-                    result = result[modelTypes[i]];
-                }
-                if(result['filters']&& result['filters'][type]){
-                    return result['filters'][type](value);
+            if(type && model){
+                if(model['filters']&& model['filters'][type]){
+                    return model['filters'][type](value);
                 }
             } 
             break;

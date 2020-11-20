@@ -8,7 +8,7 @@ Vue.config.productionTip = false
 import ElementUi from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUi,{size:'small'})
-import "@/assets/css/main.scss"
+import "@/assets/css/common.scss"
 
 
 import * as filters from './filters' // global filters

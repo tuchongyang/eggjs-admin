@@ -85,7 +85,7 @@
  *
  * @param                   login 登录
  * */
-import systemApi from '@/api/system';
+import systemApi from '@/views/system/api/';
 /* Cookies */
 import Cookies from 'js-cookie';
 
