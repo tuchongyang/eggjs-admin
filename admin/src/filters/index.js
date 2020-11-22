@@ -238,31 +238,3 @@ export function maskSecret(val){
     }
     return str;
 }
-
-/**
- * 公共Model的filter
- * @params value: 后端返回的实际值
- *         type: 过滤器名字，可以自定义，如果在Model里配置了Model.filters.signStatus, 则type=signStatus
- *         filterParams: 过滤器参数,字符串数组
- *         modelType: Model类型，如agreement对应Model.agreement
- */
-export function filter(value, type, filterParams, model) {
-    if(!filterParams) filterParams=[];
-    
-    switch(type){
-        case 'time': return time(value,...filterParams);
-        case 'constant': return constant(value,...filterParams);
-        case 'castFilter': return castFilter(value,...filterParams);
-        case 'currency': return currency(value,...filterParams);
-        case 'maskSecret': return maskSecret(value,...filterParams);
-        default:
-            if(type && model){
-                if(model['filters']&& model['filters'][type]){
-                    return model['filters'][type](value);
-                }
-            } 
-            break;
-    }
-    return emptyFilter(value)
-}
-

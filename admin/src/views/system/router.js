@@ -1,5 +1,6 @@
 import Layout from '@/components/layout/index.vue'
 import Menu from './views/menu'
+import Role from './views/role'
 
 export default  [{
     path: '/system',
@@ -9,6 +10,10 @@ export default  [{
         {
             path: 'menu',
             component: Menu,
+        },
+        {
+            path: 'role',
+            component: Role,
         }
     ]
 }]

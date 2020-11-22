@@ -102,7 +102,7 @@ export default{
 					// beforeSelect 是一个方法，如果需要过滤下拉列表里的数据时可以通过beforeSelect方法
 					list = this.item.beforeSelect(list,this.form)
 				}
-				this.item.options=list
+				this.$set(this.item,'options',list)
 			})
 		},
 		onChange(data){

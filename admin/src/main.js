@@ -22,7 +22,8 @@ Vue.prototype.$auth = function(authId, action) {
   }
   return false;
 }
-
+import TableMain from '@/components/TableMain';
+Vue.component('TableMain',TableMain)
 new Vue({
   render: h => h(App),
   router,

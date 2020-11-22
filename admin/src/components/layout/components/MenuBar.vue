@@ -11,7 +11,7 @@
         <el-aside width="220px" class="menu-bar" :class="{'hover-open':hoverActive}">
             <MenuToggle v-if="device!='mobile'"></MenuToggle>
             <div class="main-menu">
-				<el-menu :collapse="!sidebar.opened" :default-active="sidebar.currentActive" :id="$route.path+''" :default-openeds="sidebar.currentOpeneds" >
+				<el-menu :collapse="!sidebar.opened" :default-active="current.active" :id="$route.path+''" :default-openeds="current.openeds" >
                     <MenuBarItem :menus="menuList"></MenuBarItem>
                 </el-menu>
             </div>
@@ -39,14 +39,25 @@ export default {
             isHover:false,
             menuList:[],
             onHoverTimer:null,
-            onLeaveTimer:null
+            onLeaveTimer:null,
+            // sidebar:{
+            //     currentActive:'',
+            //     currentOpeneds:''
+            // }
         }
     },
     computed: {
         ...mapGetters(['sidebar','device']),
+        current(){
+            var urls = this.$route.path.split('/').filter(a=>a).map(a=>'/'+a);
+            return {
+                active: this.$route.path,
+                openeds: urls.map((item,i)=>urls.slice(0,i+1).join(''))
+            }
+        }
     },
     mounted(){
-        this.getList()
+        this.getList();
     },
     methods: {
         toggleAside() {
@@ -66,9 +77,6 @@ export default {
                     isRoot: true
                 })
                 this.menuList = list
-                this.$store.dispatch('setSideBarIndex',{path:this.$route.path});
-                this.$store.dispatch('setSideBarActive',this.$route.path);
-                this.$store.dispatch('setSideBarOpeneds',this.$route.path);
             }).catch(err=>{
                 
             })

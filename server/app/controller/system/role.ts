@@ -47,7 +47,7 @@ export default class RoleController extends Controller {
     @bp.get('/:id/menu')
     public async menu(){
         const { ctx } = this;
-        const data = await ctx.service.system.role.getMenuTree(ctx.params.id)
+        const data = await ctx.service.system.role.getMenus(ctx.params.id)
         ctx.success(data)
     }
     /**新增、保存角色菜单 */

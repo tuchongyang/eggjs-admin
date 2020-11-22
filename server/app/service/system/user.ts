@@ -27,7 +27,7 @@ export default class UserService extends Service {
     public async save(options: any) {
         const { ctx } = this
         const {  password } = options
-        let results = { code: 10000, message: "失败", }
+        let results = { code: 400, message: "失败", }
         await ctx.model.SystemUser.findOne({
             where: { username:options.username, },// 查询条件 
         }).then(async result => {
@@ -38,13 +38,13 @@ export default class UserService extends Service {
                     results = { code: 0, message: "添加成功", }
                 }).catch(err => {
                     results = {
-                        code: 10000,
+                        code: 400,
                         message: err,
                     }
                 })
             } else {
                 results = {
-                    code: 10000,
+                    code: 400,
                     message: "该账号已存在",
                 }
             }
@@ -55,13 +55,13 @@ export default class UserService extends Service {
     /**更新 */
     public async update(options: any) {
         const { ctx } = this
-        let results = { code: 10000, message: "失败", }
+        let results = { code: 400, message: "失败", }
         await ctx.model.SystemUser.update(options,{
             where:{id: options.id}
         }).then(() => {
             results = { code: 0, message: "更新成功", }
         }).catch(err => {
-            results = { code: 10000, message: err, }
+            results = { code: 400, message: err, }
         })
         return results
     }
@@ -113,7 +113,7 @@ export default class UserService extends Service {
         await this.ctx.model.SystemUser.destroy({ where: { id}}).then(() => {
             results = { code: 0, message: "删除成功", }
         }).catch(error => {
-            results = { code: 10000, message: error, }
+            results = { code: 400, message: error, }
         })
         return results
     }

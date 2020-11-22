@@ -1,26 +1,25 @@
 <template>
     <div class="table-container" @mousemove="onMousemove" @mousedown="onMousedown" @mouseup="onMouseup">
-        <TableColumnFilter v-if="!hiddenColumnFilter" :items="filterColumns" ></TableColumnFilter>
-        <el-table ref="multipleTable" class="hyperone-table table" v-bind="$attrs" border :data="list" fit style="width: 100%"  tooltip-effect="dark" highlight-current-row v-loading="loading" @row-click="onRowClick" @row-contextmenu="onRowContextmenu" @selection-change="handleSelectionChange" v-if="currentModel">
+        <TableColumnFilter :items="filterColumns" ></TableColumnFilter>
+        <el-table ref="multipleTable" class="hyperone-table table" v-bind="$attrs" border :data="list" fit style="width: 100%"  tooltip-effect="dark" highlight-current-row v-loading="loading" @row-click="onRowClick" @row-contextmenu="onRowContextmenu" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" class-name="hide-column" v-if="selection"></el-table-column>
-            <el-table-column type="index" v-if="index" :label="$t('table.id')" fixed="left" width="55"></el-table-column>
+            <el-table-column type="index" v-if="index" label="序号" fixed="left" width="55"></el-table-column>
             <!--表格列-->
             <template v-if="columnItems.length">
                 <template v-for="(item,index) in columnItems">
                     <el-table-column v-if="item.children && item.children.length" :label="item.label" :fixed="index==0?'left':undefined" :key="index">
-                        <template v-for="(citem,i) in item.children" >
-                            <TableItem :item="citem" :key="i" v-if="citem.show" :type="type"></TableItem>    
+                        <template v-for="(citem,i) in item.children">
+                            <TableItem :item="citem" :key="i" :hasSlot="!!$scopedSlots[item.prop]" v-if="typeof(citem.show)=='undefined' || citem.show">
+                                <slot :name="item.prop" :slot="item.prop" slot-scope="scope" :row="scope.row"></slot>
+                            </TableItem>
                         </template>
                     </el-table-column>
                     <template  v-else>
-                        <TableItem :item="item" v-if="item.show" :key="index" :type="type" :fixed="index == 0 ? 'left' : (item.fixed || undefined)"></TableItem>
+                        <TableItem :item="item" :hasSlot="!!$scopedSlots[item.prop]" v-if="typeof(item.show)=='undefined' || item.show" :key="index" :fixed="index == 0 ? 'left' : (item.fixed || undefined)">
+                            <slot :name="item.prop" :slot="item.prop" slot-scope="scope" :row="scope.row"></slot>
+                        </TableItem>
                     </template>
                 </template>
-                <el-table-column label="操作" :width="currentModel.config && currentModel.config.actionWidth" fixed="right" v-if="$scopedSlots.action">
-                    <template slot-scope="scope">
-                        <slot name="action" :row="scope.row"></slot>
-                    </template>
-                </el-table-column>
             </template>
             <template slot="empty" v-if="!loading"><slot name="empty"></slot></template>
             
@@ -29,13 +28,9 @@
             <span class="select-tip" v-if="selection">已选 {{multipleSelection.length}} 条</span>
             <slot name="control" :multipleSelection="multipleSelection"></slot>
         </div>
-		<div style="overflow: hidden;" v-if='!simplePage'>
-			<div class="pull-right currentPage" v-if="total > listQuery.pageSize && !simplePage && removePager"> 当前第 {{listQuery.pageIndex}} 页</div>
-			<div class="pull-right">
-				<pagination :total="total" :layout="layout" v-if='!simplePage' :small="paginationSmall"  :pageIndex.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
-			</div>
+		<div style="overflow: hidden;">
+			<pagination :total="total" :pageIndex.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
 		</div>
-		<PagerSelf v-if="total > 0 &&simplePage" :total="total" :pageIndex.sync="listQuery.index" :pageSize.sync="listQuery.pageSize" @pagination="getList"></PagerSelf>
     </div>
 </template>
 <script>
@@ -45,69 +40,23 @@ import {mapGetters} from 'vuex';
 import {deepClone} from '@/utils'
 import TableItem from './TableItem';
 import PagerSelf from '@/components/PagerSelf';
-import Model from '@/model'
 export default {
+    name:'TableMain',
     components:{Pagination,TableColumnFilter,TableItem,PagerSelf},
     props:{
-        //对应Model
-        type: '',
-        listQuery: {},
-        
-        removePager:{
-            type:Boolean,
-            default:false
-        },
-        //是否隐藏定制表头
-        hiddenColumnFilter:false,
+        columnItems:{type:Array,default(){return []}},
+        listQuery: {type: Object,default(){return {pageIndex:1,pageSize:10}}},
         selection: false,
-        index:false,
-        disableColumn:'',
-		paginationSmall: false,
-
-        isDataFromApi:{
-            type: Boolean,
-            default:true,//默认为true
-        },
-        //来着非api的table显示数据
-        listFromParent: {
-            type: Array,
-            default(){return []}
-        },
-		//显示PagerSelf或者pagination  默认：pagination
-		simplePage:{
-            type: Boolean,
-            default:false,
-        },
-		//控制 loading 
-		loadingType:{
-			type: Boolean,
-			default:true,
-		},
-		
-
-    },
-    computed:{
-        currentModel(){
-            const model = Model;
-            return eval('model.'+this.type);
-        },
+        index: false,
+        api: null
     },
     watch:{
-		type(){
-			this.getColumns();
-		},
-
-        // listFromParent(val){
-        //     this.init();
-        // }
     },
     data(){
         return {
             list:[],
-            layout:'',
             loading: false,
             multipleSelection:[],
-            columnItems:[],
             filterColumns:[],
             total: 0,
             i:1,
@@ -122,67 +71,23 @@ export default {
 
     methods:{
 		init(){
-			if(this.currentModel){
-			    if(!this.isDataFromApi){
-			        if(!this.listFromParent.length){
-			            return this.list = [];//外头也可能传空
-			        }
-			        this.list = this.listFromParent;
-			        // console.log('listFromParent',this.list);
-			    }else{
-			        this.getList();//默认从api
-			    }
-			}
-            this.getColumns();
-            if(this.removePager){
-                this.layout = 'total, sizes, prev, next'
-            }else{
-                this.layout = 'total, sizes, prev, pager, next, jumper'
+            if(this.api){
+                this.getList();//默认从api
             }
+            this.getColumns();
 		},
         getList(options){
             this.$emit('before')
-          var params = this.getParams();
-          this.loading = options&&typeof(options.loading)!=='undefined'?options.loading:true;
-          this.currentModel.api.list(params).then(res=>{
-            this.loading = false;
+            this.loading = options&&typeof(options.loading)!=='undefined'?options.loading:true;
+            this.api(this.listQuery).then(res=>{
+                this.loading = false;
+                this.list = res.result.rows||res.result;
+                this.total = res.result.count||0;
+                this.$emit('success',this.list);
+            }).catch((err)=>{
+                this.loading = false;
+            })
 
-            var listKey = this.currentModel.config && this.currentModel.config.listKey ?this.currentModel.config.listKey:'result.data',
-                totalKey = this.currentModel.config && this.currentModel.config.totalKey ? this.currentModel.config.totalKey:'result.total';
-
-            this.list = eval('res.'+listKey);
-            this.total = eval('res.'+totalKey)||0;
-            if(this.currentModel.itemsFilter){
-              this.list = this.list.map(this.currentModel.itemsFilter)
-            }
-
-            this.$emit('update:total',this.total);
-            this.$emit('update:list',this.list);
-            this.$emit('success',this.list);
-
-          }).catch((err)=>{
-            this.loading = false;
-          })
-
-        },
-        getParams(){
-            var params = deepClone(this.listQuery);
-            for(let i in params){
-                var item = params[i]
-                if(typeof item === 'object'){
-                    if(typeof item.tableKey === 'object' && item.tableKey.length){
-                        this.$set(params,item.tableKey[0],item.value[0] || '')
-                        this.$set(params,item.tableKey[1],item.value[1] || '')
-                        delete params[item.value]
-                    }else{
-                        params[item.tableKey || i]=item.value;
-                    }
-                    item.tableKey && item.tableKey!==i && (delete params[i]);
-                   
-                }
-            }
-
-            return params
         },
         handleSelectionChange(val) {
             this.multipleSelection = val;
@@ -206,23 +111,6 @@ export default {
             this.$emit('row-contextmenu',row,column,event)
         },
         getColumns(){
-            let result = [];
-            if(this.currentModel){
-                let items = this.currentModel.items;
-                if(this.currentModel.getItems && this.currentModel.getItems instanceof Function){
-                    items = this.currentModel.getItems()
-                }
-                result = items.filter(item=>{
-                    if(item.children){
-                        item.children = item.children.filter(citem=>!this.disableColumn || this.disableColumn.split(',').indexOf(citem.prop)<=-1)
-                    }
-                    return !this.disableColumn || this.disableColumn.split(',').indexOf(item.prop)<=-1
-                })
-            }
-            // console.log('rrr,',result)
-            this.columnItems = result
-
-            // console.log('result=======',result);
             var result1 = []
             this.columnItems.forEach(item=>{
                 if(item.children && item.children.length){

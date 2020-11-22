@@ -6,7 +6,7 @@ module.exports = app => {
         name: STRING, // 菜单名
         url: STRING, //菜单路径
         icon: STRING, //菜单图标
-        parentId: INTEGER, // 上级菜单id
+        parentId: { type: INTEGER, defaultValue: null }, // 上级菜单id
         sort: INTEGER,
         status: { type: INTEGER, defaultValue: 1 }, //  状态： 0:禁用, 1:启用
     },{freezeTableName: true});

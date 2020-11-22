@@ -5,11 +5,18 @@ import { bp } from 'egg-blueprint'
 */
 bp.prefix('/api/menu', 'MenuController')
 export default class MenuController extends Controller {
-    /** 列表 */
+    /** 分页列表 */
     @bp.get('/')
     public async index() {
         const { ctx } = this;
         let list = await ctx.service.system.menu.list(ctx.query)
+        ctx.success(list)
+    }
+    /** 不分页列表 */
+    @bp.get('/list')
+    public async list() {
+        const { ctx } = this;
+        let list = await ctx.service.system.menu.select()
         ctx.success(list)
     }
     /** 菜单树 */
@@ -24,6 +31,7 @@ export default class MenuController extends Controller {
     public async save(){
         const { ctx } = this;
         let params = ctx.request.body;
+        if(!params.parentId){delete params.parentId}
         let ret = await ctx.service.system.menu.save(params);
         if(ret.code==0){
             ctx.success()

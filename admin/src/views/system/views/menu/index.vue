@@ -1,22 +1,32 @@
 <template>
-    <el-container direction="vertical" class="menu-conatiner">
-        <!-- <div class="table-filter">
-            <el-button type="primary" @click="edit()" class="float-right">创建</el-button>
-        </div> -->
-        <el-tree ref="tree" class="menu-tree" :props="props" :data="tree"   v-if="!treeHide" highlight-current>
+    <el-container direction="vertical">
+        <el-header class="sub-header-bar" height="40px">
+            <!-- 右侧 刷新按钮 -->
+            <el-button type="text" class="btn-refresh" icon="el-icon-refresh" @click="refresh">刷新</el-button>
+            <!-- 左侧 页面模块标题 -->
+            <div class="sub-header-title">管理菜单1</div>
+        </el-header>
+        <el-main class="center-main">
+        <div class="table-filter">
+            <el-button type="primary" @click="edit()" icon="el-icon-plus" class="float-right">添加</el-button>
+        </div>
+        <div class="menu-conatiner">
+        <el-tree ref="tree" class="menu-tree" :props="props" :data="tree" highlight-current default-expand-all>
             <div class="custom-tree-node" slot-scope="{ node, data }">
                 <i class="node-icon" :class="[data.icon||'el-icon-folder']"></i>
                 <span class="node-tit">{{ data.name }}</span>
                 <el-dropdown class="control" trigger="click">
                     <el-button class="el-dropdown-link" icon="el-icon-more" @click.stop type="text"></el-button>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item><div @click="()=>{edit(data)}">编辑</div></el-dropdown-item>
-                        <!-- <el-dropdown-item disabled><div @click="()=>{addChild(data)}">添加子菜单</div></el-dropdown-item> -->
-                        <!-- <el-dropdown-item disabled><div @click="()=>{remove(data)}">删除</div></el-dropdown-item> -->
+                        <el-dropdown-item><div @click="()=>{edit(data,node)}"><i class="el-icon-edit"></i> 编辑</div></el-dropdown-item>
+                        <el-dropdown-item><div @click="()=>{addChild(data)}"><i class="el-icon-plus"></i> 添加子菜单</div></el-dropdown-item>
+                        <el-dropdown-item><div @click="()=>{remove(data)}" class="color-red"><i class="el-icon-delete"></i> 删除</div></el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
         </el-tree>
+        </div>
+        </el-main>
     </el-container>
 </template>
 <script>
@@ -36,8 +46,7 @@ export default {
                 children: 'children',
                 isLeaf: 'leaf'
             },
-            tree: [],
-            treeHide: false
+            tree: []
         }
     },
     created() {
@@ -50,14 +59,21 @@ export default {
             })
 
         },
-        edit(data) {
+        edit(data,node) {
+            var schema = [
+                {label:'菜单名称',prop: "name"},
+                {label:'图标',prop: "icon"},
+                {label:'路径',prop: "url"}
+            ]
+            if(data){
+                data.parent = node.parent.data.name||'无'
+                schema.unshift({label:'父级菜单',prop: "parent",readonly:true})
+            }else{
+                schema.unshift({label:'父级菜单',prop: "parentId",formtype:'select',remote:true,remoteMethod:systemApi.menu.select,valueKey:'id',labelKey:'name'})
+            }
             FormDialog.show({
                 title: data ? '编辑菜单' : '添加菜单',
-                schema:[
-                    {label:'菜单名称',prop: "name"},
-                    {label:'图标',prop: "icon"},
-                    {label:'路径',prop: "url"}
-                ],
+                schema: schema,
                 rules:{
                     name:[
                         {required: true, message: '请输入菜单名称',trigger: 'blur'}
@@ -75,18 +91,35 @@ export default {
             this.loadNode();
         },
         addChild(data) {
-        	FormDialog.show({
-                title: i18n.t('route.menuCreate'),
-                type: 'permission.auth.menu',
-                form: {fatherId: data.id},
+            var form={
+                parent:data.name,
+                parentId:data.id,
+            }
+        	var schema = [
+                {label:'父级菜单',prop: "parent",readonly:true},
+                {label:'父级菜单',prop: "parentId",hidden:true},
+                {label:'菜单名称',prop: "name"},
+                {label:'图标',prop: "icon"},
+                {label:'路径',prop: "url"}
+            ]
+            FormDialog.show({
+                title:'添加菜单',
+                schema: schema,
+                rules:{
+                    name:[
+                        {required: true, message: '请输入菜单名称',trigger: 'blur'}
+                    ]
+                },
+                api:{save: systemApi.menu.save,update: systemApi.menu.save},
+                form: form,
                 submit: this.submit
             })
         },
         remove(data){
-        	this.$confirm('确认删除菜单【'+data.menuName+'】吗','提示').then(res=>{
-        		menu.remove([data.id]).then(res=>{
+        	this.$confirm('确认删除菜单【'+data.name+'】吗','提示').then(res=>{
+        		systemApi.menu.remove(data.id).then(res=>{
         			this.$message({type:'success',message:'删除成功',duration: 2000});
-        			
+        			this.loadNode();
         		})
         	}).catch(()=>{})
         }

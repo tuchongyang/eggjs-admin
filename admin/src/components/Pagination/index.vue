@@ -4,10 +4,9 @@
  - @author          涂重阳
  - @email           779311998@qq.com
  - @phone           18707133663
- - @create          2019-03-21 09:00
 -->
 <template>
-    <div :class="{'hidden':hidden}" class="pagination-container" v-if="total>pageSizes1[0]">
+    <div :class="{'hidden':hidden}" class="pagination-container">
         <el-pagination :background="background" :disabled='disabled' :small='small' :current-page.sync="currentPage" :page-size.sync="pageSize" :layout="layout" :page-sizes="pageSizes1" :total="total" v-bind="$attrs" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 </template>

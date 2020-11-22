@@ -1,3 +1,4 @@
 import user from './user'
 import menu from './menu'
-export default{user,menu}
+import role from './role'
+export default{user,menu,role}

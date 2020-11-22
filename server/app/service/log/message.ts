@@ -25,11 +25,11 @@ export default class MessageService extends Service {
    */
     public async save(options: any) {
         const { ctx } = this
-        let results = { code: 10000, message: "失败", }
+        let results = { code: 400, message: "失败", }
         await ctx.model.LogMessage.upsert(options).then(() => {
             results = { code: 0, message: "添加成功", }
         }).catch(err => {
-            results = { code: 10000, message: err, }
+            results = { code: 400, message: err, }
         })
 
         return results
@@ -46,7 +46,7 @@ export default class MessageService extends Service {
         await this.ctx.model.LogMessage.destroy({ where: { id}}).then(() => {
             results = { code: 0, message: "删除成功", }
         }).catch(error => {
-            results = { code: 10000, message: error, }
+            results = { code: 400, message: error, }
         })
         return results
     }

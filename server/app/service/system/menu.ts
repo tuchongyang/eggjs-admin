@@ -19,6 +19,14 @@ export default class MenuService extends Service {
         return list;
     }
     /**
+     * 不分页列表
+     * @param params - 列表查询参数
+     */
+      public async select() {
+          let list = await this.app.model.SystemMenu.findAll()
+          return list;
+      }
+    /**
      * 树形列表
      * @param params - 列表查询参数
      */
@@ -47,13 +55,12 @@ export default class MenuService extends Service {
    */
     public async save(options: any) {
         const { ctx } = this
-        let results = { code: 10000, message: "失败", }
+        let results = { code: 400, message: "失败", }
         await ctx.model.SystemMenu.upsert(options).then(() => {
             results = { code: 0, message: "添加成功", }
         }).catch(err => {
-            results = { code: 10000, message: err, }
+            results = { code: 400, message: err, }
         })
-
         return results
     }
 
@@ -68,7 +75,7 @@ export default class MenuService extends Service {
         await this.ctx.model.SystemMenu.destroy({ where: { id}}).then(() => {
             results = { code: 0, message: "删除成功", }
         }).catch(error => {
-            results = { code: 10000, message: error, }
+            results = { code: 400, message: error, }
         })
         return results
     }

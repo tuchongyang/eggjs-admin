@@ -3,18 +3,13 @@
  *
  * @author          涂重阳 | tuchongyang
  * @email           779311998@qq.com
- * @phone           18707133663
- * @create          2019-02-13 09:00
- *
- * @editAuthor      qinjunqiang
- * @update          2019-05-06 06:50
  * -->
 
 <template>
     <div class="login-container">
         <div class="wraper">
             <!-- LOGO -->
-            <div class="logo"><img :src="logoUrl" style="height: 75px" /></div>
+            <!-- <div class="logo">登录</div> -->
 
             <!-- 登录文字显示 -->
             <div class="login-desc">登录</div>
