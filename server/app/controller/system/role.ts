@@ -12,6 +12,14 @@ export default class RoleController extends Controller {
         let list = await ctx.service.system.role.list(ctx.query)
         ctx.success(list)
     }
+    /** 不分页列表 */
+    @bp.get('/list')
+    public async list() {
+        const { ctx } = this;
+        let list = await ctx.service.system.role.select()
+        ctx.success(list)
+    }
+
 
     @bp.post('/save')
     public async save(){

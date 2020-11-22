@@ -1,21 +1,29 @@
 import { Service } from 'egg';
-
+import configPermission from '../../config/permission';
 
 /**
  * role Service
  */
 export default class RoleService extends Service {
 
-  /**
-   * 列表
-   * @param params - 列表查询参数
-   */
+    /**
+    * 列表
+    * @param params - 列表查询参数
+    */
     public async list(options) {
         let {page = 1, pageSize = this.config.pageSize} = options
         let list = await this.app.model.SystemRole.findAndCountAll({
             limit: +pageSize,
             offset: pageSize * (page-1)
         })
+        return list;
+    }
+    /**
+    * 列表
+    * @param params - 列表查询参数
+    */
+    public async select() {
+        let list = await this.app.model.SystemRole.findAll()
         return list;
     }
     
@@ -114,19 +122,30 @@ export default class RoleService extends Service {
                 {model: this.app.model.SystemPermission,as:'permission'}
             ]
         })
-        //查询所有
-        return list.map(item=>{
-            item.actions = item.permission.actions.split(',').map(a=>({action:a,checked: item.actions.indexOf(a)>-1}));
-            delete item.dataValues.permission;
+        let listAll = await ctx.model.SystemPermission.findAll();
+        return listAll.map(item=>{
+            var current = list.find(a=>a.permissionId==item.id)
+            item.dataValues.checked = current?true:false;
+            item.dataValues.actions = item.actions.split(',').map(a=>({
+                action: a,
+                name: configPermission.actionNames[a],
+                checked: current && current.actions.indexOf(a)>-1 ||false
+            }));
             return item;
         })
+        //查询所有
+        // return list.map(item=>{
+        //     item.actions = item.permission && item.permission.actions.split(',').map(a=>({action:a,checked: item.actions.indexOf(a)>-1})) ||[];
+        //     delete item.dataValues.permission;
+        //     return item;
+        // })
     }
     async savePermission(roleId:number,menus: any){
         /**先将树形菜单checked为true的菜单取出来 */
-        let checkeds:any[] = menus.map(item=>{
+        let checkeds:any[] = menus.filter(a=>a.checked).map(item=>{
             return {
                 roleId: roleId,
-                permissionId: item.permissionId,
+                permissionId: item.id,
                 actions: item.actions.filter(a=>a.checked).map(a=>a.action).join(',')
             }
         });

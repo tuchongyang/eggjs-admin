@@ -132,6 +132,9 @@ export default {
                 left: 100%;
                 margin-left: -1px;
             }
+            &:last-child:before{
+                display:none
+            }
             &.open {
                 background: $black-dark;
                 color: #fff;
@@ -217,6 +220,10 @@ export default {
             }
         }
         .header-item-logo{
+            padding: 0 20px;
+            .link{
+                font-size: 18px;
+            }
             img{
                 vertical-align: middle;
                 height: 30px;

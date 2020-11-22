@@ -8,8 +8,12 @@
 		<template v-if="item.formtype=='select'">
 			<el-select v-model="form[item.prop]" placeholder="" :disabled='!!item.disabled' :filterable="item.filterable" :remote="item.remote"  :multiple="item.multiple" :remote-method="selectRemoteMethod" :clearable='item.clearable' @change="onChange()">
 				<el-option v-for="option in item.options" :key="option[item.valueKey || 'value']" :label="option[item.labelKey||'label']  || item.getLabel(option)" :value="option[item.valueKey||'value']" :disabled="option.disabled"></el-option>
-				<div slot="prefix" class="effect-input__label" :class="{'is-active':form[item.prop]!==''}">{{ item.label }}</div>
 			</el-select>
+		</template>
+		<template v-if="item.formtype=='radio'">
+			<el-radio-group v-model="form[item.prop]" :disabled='!!item.disabled'>
+				<el-radio v-for="option in item.options" :key="option[item.valueKey || 'value']"  :label="option[item.valueKey||'value']" :disabled="option.disabled">{{option[item.labelKey||'label']  || item.getLabel(option)}}</el-radio>
+			</el-radio-group>
 		</template>
 		<!-- formtype 为 时间类型的-->
 		<template v-if="['week','date','month','daterange','monthrange'].indexOf(item.formtype)>-1">

@@ -3,7 +3,7 @@
         <div class="drawer-body" v-loading="loading">
         <el-tree ref="tree" class="menu-tree" :props="props" :data="tree" highlight-current default-expand-all >
             <div class="custom-tree-node" slot-scope="{ node, data }">
-                <el-checkbox v-model="data.checked" :indeterminate="data.children && !!data.children.length && !node.childNodes.every(a=>a.data.checked)" :label="data.id">{{null}}</el-checkbox>
+                <el-checkbox v-model="data.checked" :indeterminate="data.checked && data.children && !!data.children.length && !node.childNodes.every(a=>a.data.checked)" :label="data.id">{{null}}</el-checkbox>
                 <i class="node-icon" :class="[data.icon||'el-icon-folder']"></i>
                 <span class="node-tit">{{ data.name }}</span>
             </div>
@@ -93,7 +93,7 @@ export default {
 <style scoped lang="scss">
 .custom-tree-node{
     .el-checkbox{
-        margin-right:10px;
+        margin-right:0;
     }
     .node-icon{
         margin-right: 10px;

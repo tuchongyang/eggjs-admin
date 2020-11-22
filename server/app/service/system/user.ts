@@ -84,7 +84,7 @@ export default class UserService extends Service {
                 
                 await ctx.model.SystemUser.findOne({where: options,}).then((data) => {
                     if(!data){
-                        return (results = { code: 400, message: "账号不存在", token: '' })
+                        return (results = { code: 400, message: "帐号或密码错误", token: '' })
                     }
                     /*
                     * sign({根据什么生成token})
@@ -128,7 +128,7 @@ export default class UserService extends Service {
                 as: 'role',//这里的 as需要与之前定义的as名字相同
             }]
         }).then(async res => {
-            var permissions = await ctx.model.SystemRolePermission.findAll({where: {roleId: res.dataValues.role.dataValues.id}});
+            var permissions = res.dataValues.role && await ctx.model.SystemRolePermission.findAll({where: {roleId: res.dataValues.role.dataValues.id}}) ||[];
             res.dataValues.permissions = permissions||[]
             userInfo = res
         })

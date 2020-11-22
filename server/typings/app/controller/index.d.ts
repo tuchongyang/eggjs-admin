@@ -5,6 +5,7 @@ import 'egg';
 import ExportHome from '../../../app/controller/home';
 import ExportLogMessage from '../../../app/controller/log/message';
 import ExportSystemMenu from '../../../app/controller/system/menu';
+import ExportSystemPermission from '../../../app/controller/system/permission';
 import ExportSystemRole from '../../../app/controller/system/role';
 import ExportSystemUser from '../../../app/controller/system/user';
 
@@ -16,6 +17,7 @@ declare module 'egg' {
     }
     system: {
       menu: ExportSystemMenu;
+      permission: ExportSystemPermission;
       role: ExportSystemRole;
       user: ExportSystemUser;
     }

@@ -8,26 +8,17 @@
         <div class="submenu">
             <div class="content">
                 <el-row>
-                    <el-col :span="6" class="tit">企业名称:</el-col>
-                    <el-col :span="18" class="txt">{{user.tenantName}}</el-col>
+                    <el-col :span="6" class="tit">姓名:</el-col>
+                    <el-col :span="18" class="txt">{{user.name}}</el-col>
                 </el-row>
                 <el-row>
                     <el-col :span="6" class="tit">用户名:</el-col>
-                    <el-col :span="18" class="txt" style="text-overflow: unset;white-space:normal;">{{user.username}} ({{user.tenantId}})</el-col>
-                </el-row>
-                <el-row v-if="user.roles && user.roles.length">
-                    <el-col :span="6" class="tit">角色:</el-col>
-                    <el-col :span="18" class="det">
-                        <p v-if="user && user.roles"><span class="role" :class="'role-'+item.type" v-for="(item,index) in user.roles" :key='index'>{{item.name}}</span><!-- &nbsp;&nbsp;<i class="el-icon-question"></i> --></p>
-                    </el-col>
+                    <el-col :span="18" class="txt" style="text-overflow: unset;white-space:normal;">{{user.username}}</el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="6" class="tit">当前身份:</el-col>
+                    <el-col :span="6" class="tit">角色:</el-col>
                     <el-col :span="18" class="det">
-                        {{tenantName}}
-                        <el-button type="text" size="mini" @click="application" v-if='user.tenantType == "2" && tenantStatus == 0'>申请为服务商</el-button>
-                        <span v-if="tenantStatus>=1" style="font-size: 10px;color: #999;">服务商申请审批中</span>
-                        
+                        <p v-if="user.role"><span class="role role-1">{{user.role.name}}</span><!-- &nbsp;&nbsp;<i class="el-icon-question"></i> --></p>
                     </el-col>
                 </el-row>
             </div>
@@ -62,27 +53,9 @@ export default{
     },
     created(){
         
-        switch(this.user.tenantType){
-        	case '1':
-                this.tenantName = '服务商'
-            break;
-        	case '2':
-        	    this.tenantName = '普通客户'
-                this.getStatus()
-        	break;
-            case '0':
-                this.tenantName = '运营商'
-            break;
-        
-        }
         
     },
     methods:{
-        getStatus(){
-            // endUserApi.tenantApplyStatus().then(res=>{
-            //     this.tenantStatus = res.result
-            // })
-        },
         application(){
             this.visible = true
             

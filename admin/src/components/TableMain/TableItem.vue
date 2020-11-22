@@ -8,7 +8,7 @@
 			<span v-else>
 				<el-tooltip class="icon-after" effect="dark" placement="right" :open-delay="300" :tabindex="-1" :disabled="!item.tooltip || (item.prop.indexOf(',')<=-1) && !scope.row[item.prop]||scope.row[item.prop]==='--'">
 					<div :class="typeof(item.break)==='undefined' || item.break?'break-word':''">
-						{{scope.row[item.prop]}}
+						{{scope.row[item.prop]|emptyFilter}}
 					</div>
 					<div slot="content" style="max-width: 400px; max-height: 300px;overflow-y: auto;" v-if="!(!item.tooltip || (item.prop.indexOf(',')<=-1) && !scope.row[item.prop]||scope.row[item.prop]==='--')">
                             <div v-if="typeof(item.tooltip) ==='object' || typeof(item.tooltip) ==='function'" v-html="getContent(item,scope.row)"></div>

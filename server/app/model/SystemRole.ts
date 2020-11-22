@@ -7,7 +7,7 @@ module.exports = app => {
         describe: STRING, // 角色描述
         status: { type: INTEGER, defaultValue: 1 }, //  状态： 0:禁用, 1:启用
         // session_key: STRING, // 微信session_key
-    },{freezeTableName: true});
+    },{timestamps: true,freezeTableName: true});
   
     return User;
 };

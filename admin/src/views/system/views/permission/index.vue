@@ -4,7 +4,7 @@
             <!-- 右侧 刷新按钮 -->
             <el-button type="text" class="btn-refresh" icon="el-icon-refresh" @click="refresh">刷新</el-button>
             <!-- 左侧 页面模块标题 -->
-            <div class="sub-header-title">角色管理</div>
+            <div class="sub-header-title">权限管理</div>
         </el-header>
         <el-main class="center-main">
             <div class="table-filter">
@@ -17,36 +17,31 @@
                 </template>
                 <template slot="action" slot-scope="scope">
                     <el-button type="text" icon="el-icon-edit" @click="edit(scope.row)">编辑</el-button>
-                    <el-button type="text" icon="el-icon-edit" @click="authMenu(scope.row)">授权菜单</el-button>
-                    <el-button type="text" icon="el-icon-edit" @click="authPermission(scope.row)">授权</el-button>
                     <el-button type="text" icon="el-icon-delete" class="color-red" @click="remove(scope.row)">删除</el-button>
                 </template>
             </TableMain>
         </el-main>
-        <RoleMenu :visible.sync="menuVisible" :data="currentData"></RoleMenu>
-        <RolePermission :visible.sync="authVisible" :data="currentData"></RolePermission>
     </el-container>
 </template>
 <script>
 import systemApi from '@/views/system/api';
 import FormDialog from '@/components/FormDialog';
 import { deepClone } from '@/utils'
-import RoleMenu from './roleMenu';
-import RolePermission from './rolePermission';
 
 export default {
-    components: { RoleMenu,RolePermission},
+    components: { },
     data() {
         return {
             listQuery: {
 
             },
-            listApi:systemApi.role.list,
+            listApi:systemApi.permission.list,
             columnItems:[
-                {prop:'name',label:'角色名称'},
-                {prop:'status',label:'状态'},
+                {prop:'name',label:'名称'},
+                {prop:'id',label:'权限ID'},
+                {prop:'actions',label:'操作'},
                 {prop:'createdAt',label:'创建时间'},
-                {prop:'action',label:'操作',width:260},
+                {prop:'action',label:'操作'},
             ],
             currentData: null,
             menuVisible: false,
@@ -59,17 +54,25 @@ export default {
     methods: {
         edit(data) {
             var schema = [
-                {label:'角色名称',prop: "name"},
+                {label:'权限ID',prop: "id"},
+                {label:'权限名称',prop: "name"},
+                {label:'操作',prop: "actions"},
             ]
             FormDialog.show({
-                title: data ? '编辑角色' : '添加角色',
+                title: data ? '编辑权限' : '添加权限',
                 schema: schema,
                 rules:{
+                    id:[
+                        {required: true, message: '请输入权限ID',trigger: 'blur'}
+                    ],
                     name:[
-                        {required: true, message: '请输入角色名称',trigger: 'blur'}
+                        {required: true, message: '请输入权限名称',trigger: 'blur'}
+                    ],
+                    actions:[
+                        {required: true, message: '请输入操作',trigger: 'blur'}
                     ]
                 },
-                api:{save: systemApi.role.save,update: systemApi.role.save},
+                api:{save: systemApi.permission.save,update: systemApi.permission.save},
                 form: data,
                 submit: this.submit
             })
@@ -81,8 +84,8 @@ export default {
             this.$refs.table.refresh();
         },
         remove(data){
-        	this.$confirm('确认删除角色【'+data.name+'】吗','提示').then(res=>{
-        		systemApi.role.remove(data.id).then(res=>{
+        	this.$confirm('确认删除权限【'+data.name+'】吗','提示').then(res=>{
+        		systemApi.permission.remove(data.id).then(res=>{
         			this.$message({type:'success',message:'删除成功',duration: 2000});
         			this.refresh();
         		})

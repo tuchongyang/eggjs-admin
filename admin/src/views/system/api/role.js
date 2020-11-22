@@ -1,6 +1,7 @@
 import axios from '@/api';
 export default{
     list:(params)=>axios.get('/api/role',{params}),
+    select:(params)=>axios.get('/api/role/list',{params}),
     detail:(id)=>axios.get('/api/role/'+id),
     save:(opt)=>axios.post('/api/role/save',opt),
     remove:(id)=>axios.delete('/api/role/'+id),
@@ -11,5 +12,5 @@ export default{
     //角色权限列表
     authList:(id)=>axios.get('/api/role/'+id+'/permission'),
     //角色权限保存
-    authSave:(id)=>axios.post('/api/role/'+id+'/permission'),
+    authSave:(id,opt)=>axios.post('/api/role/'+id+'/permission',opt),
 }

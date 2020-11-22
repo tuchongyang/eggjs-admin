@@ -12,7 +12,7 @@ const plugin: EggPlugin = {
   },
   sequelize: {
     enable: true,
-    package: 'egg-sequelize',
+    package: 'egg-sequelize'
   },
   cors: {
     enable: true,
