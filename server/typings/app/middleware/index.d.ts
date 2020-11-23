@@ -2,12 +2,16 @@
 // Do not modify this file!!!!!!!!!
 
 import 'egg';
+import ExportAdminReqLog from '../../../app/middleware/admin_req_log';
 import ExportBaseController from '../../../app/middleware/baseController';
+import ExportExecption from '../../../app/middleware/execption';
 import ExportRequireLogin from '../../../app/middleware/requireLogin';
 
 declare module 'egg' {
   interface IMiddleware {
+    adminReqLog: typeof ExportAdminReqLog;
     baseController: typeof ExportBaseController;
+    execption: typeof ExportExecption;
     requireLogin: typeof ExportRequireLogin;
   }
 }

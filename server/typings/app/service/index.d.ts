@@ -9,6 +9,7 @@ type AutoInstanceType<T, U = T extends CanExportFunc ? T : T extends AnyFunc ? R
 import ExportLogMessage from '../../../app/service/log/message';
 import ExportSystemMenu from '../../../app/service/system/menu';
 import ExportSystemPermission from '../../../app/service/system/permission';
+import ExportSystemReqLog from '../../../app/service/system/req_log';
 import ExportSystemRole from '../../../app/service/system/role';
 import ExportSystemUser from '../../../app/service/system/user';
 
@@ -20,6 +21,7 @@ declare module 'egg' {
     system: {
       menu: AutoInstanceType<typeof ExportSystemMenu>;
       permission: AutoInstanceType<typeof ExportSystemPermission>;
+      reqLog: AutoInstanceType<typeof ExportSystemReqLog>;
       role: AutoInstanceType<typeof ExportSystemRole>;
       user: AutoInstanceType<typeof ExportSystemUser>;
     }

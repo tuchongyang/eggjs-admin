@@ -21,4 +21,4 @@ module.exports = {
         msg = msg || 'not found';
         this.throw(404, msg);
     }
-  };
+};

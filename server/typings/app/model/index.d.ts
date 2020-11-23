@@ -5,6 +5,7 @@ import 'egg';
 import ExportLogMessage from '../../../app/model/LogMessage';
 import ExportSystemMenu from '../../../app/model/SystemMenu';
 import ExportSystemPermission from '../../../app/model/SystemPermission';
+import ExportSystemReqLog from '../../../app/model/SystemReqLog';
 import ExportSystemRole from '../../../app/model/SystemRole';
 import ExportSystemRoleMenu from '../../../app/model/SystemRoleMenu';
 import ExportSystemRolePermission from '../../../app/model/SystemRolePermission';
@@ -15,6 +16,7 @@ declare module 'egg' {
     LogMessage: ReturnType<typeof ExportLogMessage>;
     SystemMenu: ReturnType<typeof ExportSystemMenu>;
     SystemPermission: ReturnType<typeof ExportSystemPermission>;
+    SystemReqLog: ReturnType<typeof ExportSystemReqLog>;
     SystemRole: ReturnType<typeof ExportSystemRole>;
     SystemRoleMenu: ReturnType<typeof ExportSystemRoleMenu>;
     SystemRolePermission: ReturnType<typeof ExportSystemRolePermission>;

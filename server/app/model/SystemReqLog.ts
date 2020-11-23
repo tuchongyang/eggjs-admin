@@ -1,0 +1,17 @@
+module.exports = app => {
+    const { STRING, INTEGER } = app.Sequelize;
+  
+    const ReqLog = app.model.define('system_req_log', {
+        id: { type: INTEGER, primaryKey: true, autoIncrement: true },
+        ip: STRING, 
+        userId: INTEGER,
+        params: STRING,
+        action: STRING,
+        method: STRING,
+        status: { type: INTEGER }, //  状态： 0:禁用, 1:启用
+        consumeTime: INTEGER
+        // session_key: STRING, // 微信session_key
+    },{timestamps: true,freezeTableName: true});
+  
+    return ReqLog;
+};
