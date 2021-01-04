@@ -24,6 +24,14 @@ export default  [{
         {
             path: 'user',
             component: User,
+        },
+        {
+            path: 'log',
+            component: ()=>import('./views/log'),
+        },
+        {
+            path: 'file',
+            component: ()=>import('./views/file'),
         }
     ]
 }]

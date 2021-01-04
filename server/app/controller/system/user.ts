@@ -4,7 +4,7 @@ const requireLogin = require('../../middleware/requireLogin')()
 /**
 * @Controller 用户
 */
-bp.prefix('/api/user', 'UserController')
+bp.prefix('/user', 'UserController')
 export default class UserController extends Controller {
     /** 分页列表 */
     @bp.get('/')

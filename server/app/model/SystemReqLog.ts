@@ -12,6 +12,9 @@ module.exports = app => {
         consumeTime: INTEGER
         // session_key: STRING, // 微信session_key
     },{timestamps: true,freezeTableName: true});
-  
+    ReqLog.associate = function() {
+        // 一对一
+        ReqLog.belongsTo(app.model.SystemUser, { foreignKey: 'userId', targetKey: 'id', as: 'user'});
+    }
     return ReqLog;
 };

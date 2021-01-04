@@ -3,6 +3,7 @@
 
 import 'egg';
 import ExportLogMessage from '../../../app/model/LogMessage';
+import ExportSystemFile from '../../../app/model/SystemFile';
 import ExportSystemMenu from '../../../app/model/SystemMenu';
 import ExportSystemPermission from '../../../app/model/SystemPermission';
 import ExportSystemReqLog from '../../../app/model/SystemReqLog';
@@ -14,6 +15,7 @@ import ExportSystemUser from '../../../app/model/SystemUser';
 declare module 'egg' {
   interface IModel {
     LogMessage: ReturnType<typeof ExportLogMessage>;
+    SystemFile: ReturnType<typeof ExportSystemFile>;
     SystemMenu: ReturnType<typeof ExportSystemMenu>;
     SystemPermission: ReturnType<typeof ExportSystemPermission>;
     SystemReqLog: ReturnType<typeof ExportSystemReqLog>;

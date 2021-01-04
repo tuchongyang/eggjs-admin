@@ -3,7 +3,7 @@ import { bp } from 'egg-blueprint'
 /**
 * @Controller 角色
 */
-bp.prefix('/api/role', 'RoleController')
+bp.prefix('/role', 'RoleController')
 export default class RoleController extends Controller {
     /** 分页列表 */
     @bp.get('/')

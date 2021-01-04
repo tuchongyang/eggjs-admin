@@ -3,7 +3,7 @@ import { bp } from 'egg-blueprint'
 /**
 * @Controller 角色
 */
-bp.prefix('/api/permission', 'PermissionController')
+bp.prefix('/permission', 'PermissionController')
 export default class PermissionController extends Controller {
     /** 分页列表 */
     @bp.get('/')

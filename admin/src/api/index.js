@@ -36,11 +36,8 @@ axios.interceptors.request.use(
             })
         }
         const baseUrl = /^(\/api)/.test(config.url)?'':'/api';        
-        config.baseURL = localStorage.getItem('serverUrl')||process.env.VUE_APP_SERVER_URL||'';
+        config.baseURL = process.env.VUE_APP_SERVER_URL||'';
         
-        if(process.env.VUE_APP_AUTOIP==0){
-            config.baseURL = process.env.VUE_APP_APIPREFIX
-        }
         config.url = baseUrl+config.url
         let token = window.localStorage.getItem("token")
         if (token) {

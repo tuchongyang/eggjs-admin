@@ -3,14 +3,14 @@
 
 import 'egg';
 import ExportAdminReqLog from '../../../app/middleware/admin_req_log';
-import ExportBaseController from '../../../app/middleware/baseController';
+import ExportAuthUser from '../../../app/middleware/auth_user';
 import ExportExecption from '../../../app/middleware/execption';
 import ExportRequireLogin from '../../../app/middleware/requireLogin';
 
 declare module 'egg' {
   interface IMiddleware {
     adminReqLog: typeof ExportAdminReqLog;
-    baseController: typeof ExportBaseController;
+    authUser: typeof ExportAuthUser;
     execption: typeof ExportExecption;
     requireLogin: typeof ExportRequireLogin;
   }

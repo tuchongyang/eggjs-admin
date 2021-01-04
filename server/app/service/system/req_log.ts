@@ -31,15 +31,31 @@ export default class SysReqLogService extends Service {
     /**
      * 分页加载日志信息
      */
-    async page(page: number, count: number) {
-        const result = await this.app.model.SystemReqLog.find({
-            order: {
-                id: 'DESC',
-            },
-            take: count,
-            skip: page * count,
+    async list(options) {
+        let {page = 1, pageSize = this.config.pageSize} = options
+        const result = await this.app.model.SystemReqLog.findAndCountAll({
+            order: [
+                ["id", 'DESC'],
+            ],
+            limit: +pageSize,
+            offset: pageSize * (page-1),
+            include:[
+                {model: this.app.model.SystemUser,as:'user'}
+            ]
         });
         return result;
+    }
+
+    
+    //删除
+    public async remove(id){
+        let results
+        await this.ctx.model.SystemReqLog.destroy({ where: { id}}).then(() => {
+            results = { code: 0, message: "删除成功", }
+        }).catch(error => {
+            results = { code: 400, message: error, }
+        })
+        return results
     }
 
 

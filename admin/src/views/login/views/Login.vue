@@ -7,9 +7,10 @@
 
 <template>
     <div class="login-container">
+        <div id="particles-js" style="display: flex;align-items: center;justify-content: center"></div>
         <div class="wraper">
             <!-- LOGO -->
-            <!-- <div class="logo">登录</div> -->
+            <div class="logo"><h1>后台管理系统</h1></div>
 
             <!-- 登录文字显示 -->
             <div class="login-desc">登录</div>
@@ -17,13 +18,13 @@
             <el-form ref="form" :model="form" :rules="rules">
                 <!-- 账户 | 邮箱 -->
                 <el-form-item prop="username">
-                    <i class="icon-before ico-login-username"></i>
+                    <i class="icon-before el-icon-user"></i>
                     <el-input class="txt-username" v-model="form.username" autofocus clearable :disabled="loading" :placeholder="'请输入用户名'"></el-input>
                 </el-form-item>
 
                 <!-- 密码 -->
                 <el-form-item prop="password">
-                    <i class="icon-before ico-login-password"></i>
+                    <i class="icon-before el-icon-lock"></i>
                     <el-input class="txt-password" v-model="form.password" clearable :type="passwordType" :disabled="loading" placeholder="请输入密码"></el-input>
 
                     <!-- 显示 | 隐藏密码 -->
@@ -32,18 +33,6 @@
                     </a>
                 </el-form-item>
 
-                <el-form-item prop="verifyCode" class="code-item" v-if="is_verifyCode">
-                    <i class="icon-before ico-login-password"></i>
-                    <el-input class="txt-verifycode" v-model="form.verifyCode" clearable :disabled="loading" placeholder="验证码"></el-input>
-                    <img class="img" :src="codeSrc" ref="codeImg" @click="refreshCode">
-                    
-                </el-form-item>
-
-                <!-- 自定义接口地址，只有在本地测试环境才显示该项，所以不需要做翻译 -->
-                <el-form-item prop="ip" v-if="is_debug">
-                    <i class="icon-before ico-login-password"></i>
-                    <el-input v-model="ip" class="txt-ip" type="text" clearable :disabled="loading" placeholder="请输入后端服务ip + 端口"></el-input>
-                </el-form-item>
 
                 <!-- 记住账户和租户域 -->
                 <el-form-item class="item-remember">
@@ -51,26 +40,14 @@
                 </el-form-item>
 
                 <el-form-item>
-                    <!-- <RiButton class="btn-login" :speed="20" v-if="!loading" @click="onSubmit">登 录</RiButton> -->
-
                     <!-- 登录按钮 -->
                     <el-button class="btn-login" v-if="!loading" @click="onSubmit">登 录</el-button>
 
                     <!-- 登录中 不可点击 -->
                     <el-button class="btn-login" :loading="loading" v-if="loading">登录中...</el-button>
-                    <!-- <router-link to="/signup" class="linkto-signup">{{$t('common.applyAccount')}}</router-link> -->
                 </el-form-item>
             </el-form>
         </div>
-        <!-- <lang-select class="lang-select-login" /> -->
-        <!-- <div class="foot">
-            <span>©2019-{{yers}} {{ $t('common.onepro') }} {{ $t('common.copyrights') }} | {{ $t('common.contactUs') }}: enquiry@oneprocloud.com</span>
-            <p v-if="COPYRIGHT">
-            <a href="http://beian.miit.gov.cn/state/outPortal/loginPortal.action" target="_blank" data-type="external" rel="noopener noreferrer">沪ICP备 19015066-1号</a>&nbsp;&nbsp;
-            <img src="../../assets/images/beian2.png">&nbsp;&nbsp;
-            <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31011702005563" target="_blank" data-type="external" rel="noopener noreferrer">沪公网安备 31011702005563号</a>
-            </p>
-        </div> -->
     </div>
 </template>
 
@@ -84,13 +61,10 @@ import systemApi from '@/views/system/api/';
 /* Cookies */
 import Cookies from 'js-cookie';
 
-/* 密码加密 */
-import bgLogo from '@/assets/images/logo.png';
-	/* eslint-disable */
+import particlesJS from './particles';
 export default {
     components: { },
     data() {
-		/* eslint-enable */
         var rules = {
             username: [
                 { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -100,10 +74,6 @@ export default {
                 { required: true, message: "请输入密码", trigger: 'blur' },
                 { min: 3, max: 18, message: "密码格式不正确", trigger: 'blur' }
             ],
-            domain: [
-                { required: true, message: "请输入租户域", trigger: 'blur' },
-                { pattern: /^[0-9a-zA-Z_]{5,20}$/, message: '租户域必须为长度为5-20的数字、英文大小写', trigger: 'blur' }
-            ],
            
         };
         return {
@@ -112,31 +82,19 @@ export default {
                 username: '', // 账户 | 邮箱
                 password: '', // 密码
             },
-
-            /* 后台服务地址 */
-            ip: this.$store.getters.baseUrl,
-            // adminDomain:ROOT_CONFIG.ADMINDOMAIN,
             /* 标识是否本地测试环境 */
             is_debug: process.env.NODE_ENV !== 'production',
-            isRole: process.env.VUE_APP_ROLE,
-
-            is_verifyCode: false,
 
             /* 校验规则 */
             rules: rules,
 
             loading: false, // 标识是否正在登录中
             passwordShow: false, // 切换 显示 | 隐藏密码
-            remember: true, // 标识是否记住租户域
+            remember: true, // 标识是否记住账户
 
-            logoUrl: Cookies.get('logoUrl') || bgLogo,
-
-            needRedirect: false,//此字段标志登录后是否需要重定向，如果当前登录用户与上一个用户一致时需要重定向，否则不
             codeRandom: Math.random(),
             timer: null,
 			yers:'',
-            COPYRIGHT: typeof(COPYRIGHT)=='undefined'?'':COPYRIGHT,
-            currentRole: 'admin'
         };
     },
 
@@ -144,29 +102,15 @@ export default {
         passwordType() {
             return this.passwordShow ? 'text' : 'password';
         },
-		/* eslint-disable */
-        codeSrc(){
-            if(this.timer){window.clearTimeout(this.timer)}
-            this.timer = setTimeout(()=>{
-                this.codeRandom = Math.random();
-            },30*60*1000);
-            return this.ip + '/hyperone/verifyCode/userLogin/generate.jpg'+'?randown='+this.codeRandom;
-        }
-		/* eslint-enable */
     },
 
     created() {
         // 初始化账户和租户域
         this.initStorage();
 
-        // 非开发模式，直接忽略 cookie
-        if (!this.is_debug) {
-            this.ip = serverUrl;
-            Cookies.set('serverUrl', this.ip);
-        }
-
         this.$nextTick(() => {
             var _this = this;
+            this.initBg();
             // TODO 绑定 enter 键，提交表单
             document.onkeydown = event => {
                 var e = event || window.event || arguments.callee.caller.arguments[0];
@@ -187,34 +131,23 @@ export default {
 
     methods: {
 		
-		// ...mapMutations(['SET_ROLE']),
         /* 初始化账户和租户域 */
         initStorage() {
             let m_username = localStorage.getItem('m_username');
-            // let m_domain = localStorage.getItem('m_domain');
             if (m_username) {
                 this.form.username = m_username;
             }
-            //初始化语言
-            // let lang = Cookies.get('language') || 'zh_CN';
-        // this.$store.dispatch('setLanguage', this.$store.getters.language).then().catch(()=>{});
         },
 
         getPasswordTitle() {
             let passwordShow = this.passwordShow;
             return passwordShow ? "隐藏密码" : "显示密码";
         },
-        refreshCode(){
-            if(this.is_verifyCode){
-                this.codeRandom = Math.random()
-            }
-        },
         /* 校验通过才能进行登录 */
         onSubmit() {
             
             this.$refs['form'].validate(valid => {
                 if (!valid) {
-                    this.refreshCode();
                     return false;
                 }
                 this.login();
@@ -226,33 +159,18 @@ export default {
         login() {
             this.loading = true;
 
-            /* 设置 IP 后，存储到 cookie，公共 axios 会使用该服务器 api 地址 */
-            if (this.ip) {
-                localStorage.setItem('serverUrl', this.ip);
-                this.$store.dispatch('setBaseUrl',this.ip)
-            } else {
-                localStorage.removeItem('serverUrl');
-            }
-            //判断当前是否需要重定向
-            let m_username = localStorage.getItem('m_username');
-            if(m_username==this.form.username){
-                this.needRedirect = true;
-            }
             systemApi.user.login(this.form).then((res) => {
                 /* 设置记住账号和租户域后，存储到浏览器缓存 */
                 if (this.remember) {
                     localStorage.setItem('m_username', this.form.username);
-                    // localStorage.setItem('m_domain', this.form.domain);
                 } else {
                     localStorage.removeItem('m_username');
-                    // localStorage.removeItem('m_domain');
                 }
                 //登录后，全局缓存token
                 localStorage.setItem('token',res.result)
                 this.getUserInfo();
             })
             .catch(() => {
-                this.refreshCode();
                 this.loading = false;
             });
         },
@@ -261,24 +179,144 @@ export default {
         getUserInfo() {
             /* 登录之后调取用户信息接口 */
             this.$store.dispatch('GetUserInfo', true).then(() => {
-                    // console.log(res)
                     this.loading = false;
                     this.$message['success']("登录成功");
                     let query = this.$route.query;
                     if (query && query.redirect && query.redirect !== '/login' && this.needRedirect) {
                         this.$router.replace({ path: query.redirect });
-                        // this.$router.go(-1)
                         return;
                     }
                     this.$router.push('/');
                     // this.$router.go(-1)
                     // 查询用户身份
                 }).catch(() => {
-                    this.refreshCode();
                     this.loading = false;
                 });
                 
         },
+        initBg(){
+
+		particlesJS('particles-js',
+		  
+		  {
+		    "particles": {
+		      "number": {
+		        "value": 80,
+		        "density": {
+		          "enable": true,
+		          "value_area": 800
+		        }
+		      },
+		      "color": {
+		        "value": "#ffffff"
+		      },
+		      "shape": {
+		        "type": "circle",
+		        "stroke": {
+		          "width": 0,
+		          "color": "#000000"
+		        },
+		        "polygon": {
+		          "nb_sides": 5
+		        },
+		        "image": {
+		          "src": "img/github.svg",
+		          "width": 100,
+		          "height": 100
+		        }
+		      },
+		      "opacity": {
+		        "value": 0.5,
+		        "random": false,
+		        "anim": {
+		          "enable": false,
+		          "speed": 1,
+		          "opacity_min": 0.1,
+		          "sync": false
+		        }
+		      },
+		      "size": {
+		        "value": 5,
+		        "random": true,
+		        "anim": {
+		          "enable": false,
+		          "speed": 40,
+		          "size_min": 0.1,
+		          "sync": false
+		        }
+		      },
+		      "line_linked": {
+		        "enable": true,
+		        "distance": 150,
+		        "color": "#ffffff",
+		        "opacity": 0.4,
+		        "width": 1
+		      },
+		      "move": {
+		        "enable": true,
+		        "speed": 6,
+		        "direction": "none",
+		        "random": false,
+		        "straight": false,
+		        "out_mode": "out",
+		        "attract": {
+		          "enable": false,
+		          "rotateX": 600,
+		          "rotateY": 1200
+		        }
+		      }
+		    },
+		    "interactivity": {
+		      "detect_on": "canvas",
+		      "events": {
+		        "onhover": {
+		          "enable": true,
+		          "mode": "repulse"
+		        },
+		        "onclick": {
+		          "enable": true,
+		          "mode": "push"
+		        },
+		        "resize": true
+		      },
+		      "modes": {
+		        "grab": {
+		          "distance": 400,
+		          "line_linked": {
+		            "opacity": 1
+		          }
+		        },
+		        "bubble": {
+		          "distance": 400,
+		          "size": 40,
+		          "duration": 2,
+		          "opacity": 8,
+		          "speed": 3
+		        },
+		        "repulse": {
+		          "distance": 200
+		        },
+		        "push": {
+		          "particles_nb": 4
+		        },
+		        "remove": {
+		          "particles_nb": 2
+		        }
+		      }
+		    },
+		    "retina_detect": true,
+		    "config_demo": {
+		      "hide_card": false,
+		      "background_color": "#b61924",
+		      "background_image": "",
+		      "background_position": "50% 50%",
+		      "background_repeat": "no-repeat",
+		      "background_size": "cover"
+		    }
+		  }
+
+		);
+		}
         
         
     }
@@ -288,7 +326,20 @@ export default {
 <style lang="scss" scoped>
 @import '@/assets/css/variables.scss';
 
-
+#particles-js {
+    width: 100%;
+    height: 100%;
+    // background-image: url(../../assets/images/login_background.png);
+    // background-image: url(../../assets/images/login-bg.jpg);
+    background-size: cover;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 .login-desc {
     font-size: 20px;
     margin: 20px auto;
@@ -301,7 +352,7 @@ export default {
     height: 100%;
     left: 0;
     top: 0;
-    background: url(../../../assets/images/login-bg-1.jpg) center no-repeat #000;
+    background: #000;
     background-size: cover;
 	overflow-y: auto;
 	min-height: 700px;
@@ -332,6 +383,9 @@ export default {
             left: 0;
             right: 0;
             text-align: center;
+            h1{
+                font-size: 30px;
+            }
         }
         .el-form {
             padding: 0 20px;
@@ -515,34 +569,5 @@ export default {
         }
     }
 
-    /* 底部版权样式 start */
-    .foot {
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        right: 0;
-        text-align: center;
-        color: #ccc;
-
-        .lang {
-            margin-left: 20px;
-            color: #ccc;
-        }
-        a{
-            color: #ccc;
-            font-size: 14px;
-        }
-    }
-    /* 底部版权样式 end */
-}
-.lang-select-login {
-    position: absolute;
-    right: 120px;
-    top: 20px;
-}
-.role-select{
-    .el-radio{
-        color: #ccc;
-    }
 }
 </style>
