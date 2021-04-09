@@ -10,7 +10,7 @@ export default (appInfo: EggAppInfo) => {
     // add your egg config in here
     
 //   config.middleware = [ 'adminReqLog', 'execption', 'adminAuthority' ];
-    config.middleware = ['authUser','adminReqLog','execption'];
+    config.middleware = ['adminReqLog','execption'];
 
     // add your special config in here
     const bizConfig = {

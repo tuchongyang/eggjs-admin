@@ -1,6 +1,4 @@
 import { Service } from 'egg';
-import configPermission from '../../config/permission';
-
 /**
  * role Service
  */
@@ -123,12 +121,18 @@ export default class RoleService extends Service {
             ]
         })
         let listAll = await ctx.model.SystemPermission.findAll();
+        const actionNames = {
+            "detail":'详情',
+            "query":"查询",
+            "add":"添加",
+            "delete":"删除"
+        }
         return listAll.map(item=>{
             var current = list.find(a=>a.permissionId==item.id)
             item.dataValues.checked = current?true:false;
             item.dataValues.actions = item.actions.split(',').map(a=>({
                 action: a,
-                name: configPermission.actionNames[a],
+                name: actionNames[a],
                 checked: current && current.actions.indexOf(a)>-1 ||false
             }));
             return item;

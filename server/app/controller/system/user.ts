@@ -1,6 +1,5 @@
 import { Controller } from 'egg';
 import { bp } from 'egg-blueprint'
-const requireLogin = require('../../middleware/requireLogin')()
 /**
 * @Controller 用户
 */
@@ -66,17 +65,17 @@ export default class UserController extends Controller {
         }
     }
     
-    @bp.get('/info',requireLogin)
+    @bp.get('/info')
     public async info(){
         const { ctx } = this;
-        let user = ctx.session.user;
+        let user = ctx.user;
         const userInfo = await ctx.service.system.user.getUserInfo({id: user.id})
         return ctx.success(userInfo);
     }
-    @bp.get('/menu',requireLogin)
+    @bp.get('/menu')
     public async menu(){
         const { ctx } = this;
-        let user = ctx.session.user;
+        let user = ctx.user;
         const list = await ctx.service.system.user.getMenuTree(user.roleId)
         ctx.success(list);
     }
